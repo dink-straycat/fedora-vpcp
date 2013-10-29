@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+#
+# syntax:
+# 'sudo zbright +N' increments screen brightness by N percent (N=0-100)
+# 'sudo zbright -N' decrements screen brightness by N percent
+# 'sudo zbright N'  sets screen brightness to N percent
+# 'sudo zbright'    w/o any args reports current brightness 
+#
+# note: must be run as sudo
+#
+# 2008-12-24   Ryan M. Eustice   eustice@umich.edu
+
+# Module gma500_gfx exists.
+mod=`lsmod|grep gma500_gfx|wc -l`
+if [ $mod -gt '0' ]; then
+    if [ $1 ]; then
+        if [ "$(echo $1 | tr -d '\-')" != "$1" ]; then
+            exit
+        elif [ "$(echo $1 | tr -d '\+')" != "$1" ]; then
+            exit
+        fi
+        echo $1 > /sys/class/backlight/psb-bl/brightness
+        echo "$1" > /usr/local/etc/zbrightness
+        exit
+    fi
+    cat /sys/class/backlight/psb-bl/brightness
+    exit
+fi
+
+# probe current brightness
+ho=0x$(setpci -s 00:02.0 F4.B); # hex     (0-FF)
+do=$(printf "%d" $ho);          # decimal (0-255)
+po=$(($do*100/255));            # percent (0-100)
+#echo "$ho $do $po"
+
+if [ $1 ]; then
+    if [ "$(echo $1 | tr -d '\-')" != "$1" ]; then
+        delta=$(echo $1 | tr -d '\-');
+        p=$((po-delta));
+    elif [ "$(echo $1 | tr -d '\+')" != "$1" ]; then
+        delta=$(echo $1 | tr -d '\+');
+        p=$((po+delta));
+    else
+        p=$1;
+    fi
+
+    if [ $p -ge 100 ]; then
+        p=100;
+    fi
+    if [ $p -le 0 ]; then
+        p=0;
+    fi
+    d=$(($p*255/100));        # decimal (0-255)
+    h=0x$(printf "%x" $d);    # hex     (0-FF)
+    #echo "$h $d $p";
+
+    H=$(printf "%x" $h);      # strip 0x hex prefix
+    setpci -s 00:02.0 F4.B=$H
+    echo "$p" > /usr/local/etc/zbrightness
+else
+    echo "$ho $do $po";
+fi

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# resume brightness
+
+case "$1" in
+    suspend)
+        /usr/local/sbin/zbright > /usr/local/etc/zbrightness
+        ;;
+    resume|thaw)
+        /usr/local/sbin/zbright `cat /usr/local/etc/zbrightness`
+        ;;
+esac

@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# resume screen
+
+case "$1" in
+    resume|thaw)
+        #/usr/bin/xrandr -d :0.0 -s 1360x768
+        #/usr/bin/xrandr -d :0.0 -s 1600x768 -r 30
+        #/usr/bin/xrandr -d :0.0 -s 1600x768 -r 76
+        xrandr -d :0.0 --output LVDS-0 --off
+        xrandr -d :0.0 --output LVDS-0 --mode 1600x768 -r 76
+        /usr/local/sbin/zbright `cat /usr/local/etc/zbrightness`
+        ;;
+esac

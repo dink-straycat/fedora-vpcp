@@ -1,0 +1,4 @@
+export PM_QUIRKS="--quirk-vbe-post --quirk-vbemode-restore"
+#export PM_QUIRKS="--quirk-vbemode-restore"
+#export PM_QUIRKS="--quirk-vbe-post --quirk-vbemode-restore --quirk-vbestate-restore"
+#export PM_QUIRKS="--quirk-vbemode-restore --quirk-vbestate-restore"
